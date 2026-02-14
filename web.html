@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para ti ❤️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffe5ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            transition: height 0.3s ease;
+        }
+
+        /* Marco de la foto */
+        .photo-frame {
+            width: 100%;
+            height: 350px;
+            background-color: #fff;
+            border: 2px solid #ff4d6d;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        h2 {
+            font-family: 'Pacifico', cursive;
+            color: #ff4d6d;
+            font-size: 1.8rem;
+            min-height: 3.6rem;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            transition: all 0.2s ease;
+        }
+
+        #nextBtn {
+            background-color: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+        }
+
+        #nextBtn:hover {
+            transform: scale(1.05);
+            background-color: #e01e3f;
+        }
+
+        .final-buttons {
+            display: none;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .btn-yes {
+            background-color: #2dc653;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-no {
+            background-color: #ef233c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative; 
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            width: 20%;
+            background: #ff4d6d;
+            transition: width 0.3s ease;
+        }
+
+        /* Control de música discreto */
+        .music-control {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="cancion.mp3" type="audio/mpeg">
+        Tu navegador no soporta el audio.
+    </audio>
+
+    <div class="container">
+        <button class="music-control" onclick="toggleMusic()">🎵</button>
+
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <div class="photo-frame">
+            <img src="foto1.jpeg" id="mainPhoto" alt="Foto romántica">
+        </div>
+
+        <h2 id="mainText">Hola mi amor!!!!</h2>
+
+        <button id="nextBtn" onclick="nextSlide()">Siguiente ❤️</button>
+
+        <div class="final-buttons" id="finalOptions">
+            <button class="btn-yes" onclick="accept()">¡SÍ, OBVIO!</button>
+            <button class="btn-no" id="noBtn" onmouseover="moveBtn()" ontouchstart="moveBtn()">No</button>
+        </div>
+    </div>
+
+    <script>
+        const slides = [
+            { text: "Hola mi amor!!!!", img: "foto1.jpeg" },
+            { text: "Solo quería decirte que estos 3 meses han sido meses muy lindos...", img: "foto2.jpeg" },
+            { text: "y estoy muy feliz de que hayas llegado a mi vida", img: "foto3.jpeg" },
+            { text: "Quieres ser mi.......", img: "foto4.jpeg" },
+            { text: "San Valentín?, te amo ❤️", img: "foto5.jpeg" }
+        ];
+
+        let currentIndex = 0;
+        let musicStarted = false;
+        
+        const photo = document.getElementById('mainPhoto');
+        const text = document.getElementById('mainText');
+        const nextBtn = document.getElementById('nextBtn');
+        const finalOptions = document.getElementById('finalOptions');
+        const progressBar = document.getElementById('progress');
+        const noBtn = document.getElementById('noBtn');
+        const audio = document.getElementById('bgMusic');
+
+        // Configurar volumen inicial (0.5 es 50%)
+        audio.volume = 0.5;
+
+        function nextSlide() {
+            // Intentar reproducir música en el primer clic
+            if (!musicStarted) {
+                audio.play().catch(error => {
+                    console.log("El navegador bloqueó el autoplay, se necesita otro clic.");
+                });
+                musicStarted = true;
+            }
+
+            currentIndex++;
+
+            if (currentIndex < slides.length) {
+                photo.style.opacity = 0;
+
+                setTimeout(() => {
+                    photo.src = slides[currentIndex].img;
+                    text.innerText = slides[currentIndex].text;
+                    photo.style.opacity = 1;
+                }, 200);
+
+                const percentage = ((currentIndex + 1) / slides.length) * 100;
+                progressBar.style.width = percentage + '%';
+
+                if (currentIndex === slides.length - 1) {
+                    nextBtn.style.display = 'none';
+                    finalOptions.style.display = 'flex';
+                    noBtn.style.position = 'relative'; 
+                }
+            }
+        }
+
+        function moveBtn() {
+            noBtn.style.position = 'fixed'; 
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        }
+
+        function accept() {
+            text.innerHTML = "¡Sabía que no dirias que no! <br>Te amo.";
+            finalOptions.style.display = 'none';
+            launchConfetti();
+        }
+
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        function launchConfetti() {
+            const colors = ['#ff0000', '#ff4d6d', '#ffb3c1'];
+            for(let i=0; i<50; i++) {
+                const particle = document.createElement('div');
+                particle.innerText = '❤️';
+                particle.style.position = 'fixed';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = '-20px';
+                particle.style.fontSize = Math.random() * 20 + 20 + 'px';
+                particle.style.transition = 'top 3s ease, transform 3s ease';
+                particle.style.zIndex = 1000;
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.style.top = '110vh';
+                    particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+                }, 100);
+            }
+        }
+    </script>
+</body>
+</html>
